@@ -1,0 +1,12 @@
+10
+q Zadati tekst za slovo q
+Q ako se pritisne veliko slovo Q
+l svaki tekst je odvojen sa znakom space a
+1 takodje se uvek zavrsava sa karakterom \n
+@ ovaj tekst ce uvek biti kraci od 64 karaktera
+z Svaki mnemonik ce biti unikatan i zavisi od layouta skenkodova
+t tako da moze biti svaki ascii karakter koji je unet u  scancod
+A es.tbl datoteku
+w vlaske magije
+W o.O
+

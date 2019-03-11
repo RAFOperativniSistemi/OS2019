@@ -17,12 +17,31 @@ int itoa(int n, char *buf);
 /* Parses a number from the provided pointer to the first non-digit character */
 int atoi(const char *buf);
 
+/* Pauses execution until enter is pressed */
+void pause(void);
+
+/* Reads from file fd until it hits maxlen or \n */
+int fgets(char *buffer, int maxlen, int fd);
+
+#define vardump(x) \
+{\
+	char buff[128];\
+	int len;\
+	len = itoa(x, buff);\
+	write(1, #x ": ", strlen(#x ": "));\
+	write(1, buff, len);\
+	write(1, "\n", 1);\
+}
+
+#define printstr(x) write(1, x, strlen(x));
+#define printerr(x) write(2, x, strlen(x));
+
 #ifdef UTIL_IMPLEMENTATION
 
 #ifndef __isdigit
 #define __isdigit(x) ((x >= '0') && (x <= '9'))
 #endif
-/* isdigit endif*/
+/* isdigit endif */
 
 static void __reverse(char *buf, int len)
 {
@@ -61,8 +80,29 @@ int atoi(const char *buf)
 	return r;
 }
 
+void pause()
+{
+	char b[10];
+	printstr("Press enter to continue...");
+	read(0, b, 10);
+}
+
+int fgets(char *buffer, int maxlen, int fd)
+{
+	int i = 0;
+	char c;
+	do
+	{
+		if(!read(fd, &c, 1) || i == maxlen - 1) break;
+		buffer[i++] = c;	
+
+	} while(c != '\n' && c!='\0');
+	buffer[i] = '\0';
+	return i;
+}
+
 
 #endif
-/* impl endif*/
+/* impl endif */
 #endif
 /* headerguard endif */
