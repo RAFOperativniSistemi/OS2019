@@ -18,3 +18,6 @@ Vezbe ce imati odvojene branch-ove sa nazivima u formatu _vezba#_, npr. za vezbu
 
 ### Napomena:
 Za konsultacije je potrebno se najaviti bar jedan dan unapred putem maila asistentu kojem planirate doci na konsultacije. Takodje je pozeljno u mailu navesti povod konsultacija radi eventualne pripreme od strane asistenta.
+
+### Branch tag:
+Ovaj branch je pripremljeno stanje za vezbe u cetvrtoj nedelji
