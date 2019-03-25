@@ -315,6 +315,7 @@ minus:	cmpb $1,e0
 	xorl %ebx,%ebx
 	jmp put_queue
 
+
 /*
  * This table decides which routine to call when a scan-code has been
  * gotten. Most routines just call do_self, or none, depending if

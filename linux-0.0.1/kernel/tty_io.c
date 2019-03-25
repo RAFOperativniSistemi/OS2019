@@ -127,7 +127,7 @@ static void sleep_if_full(struct tty_queue * queue)
 }
 
 //ako je ovo 0 nema prikaza, ako je 1 ima
-int prikaz = 1;
+int prikaz = 0;
 
 void copy_to_cooked(struct tty_struct * tty)
 {
