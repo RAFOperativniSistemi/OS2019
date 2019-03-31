@@ -76,7 +76,7 @@ static void time_init(void)
 	startup_time = kernel_mktime(&time);
 }
 
-int main(void)		/* This really IS void, no error here. */
+int main(void)		/* This really IS void, no error here. */	/* OS2019 */
 {			/* The startup routine assumes (well, ...) this */
 /*
  * Interrupts are still disabled. Do necessary setups, then
@@ -119,7 +119,7 @@ static int printf(const char *fmt, ...)
 static char * argv[] = { "/bin/sh",NULL };
 static char * envp[] = { "HOME=/root","PATH=/bin","PWD=/", NULL };
 
-void init(void)
+void init(void) /* OS2019 */
 {
 	int i,j;
 
@@ -135,7 +135,7 @@ void init(void)
 	else if (!i) {
 		close(0);close(1);close(2);
 		setsid();
-		(void) open("/dev/tty0",O_RDWR,0);
+		(void) open("/dev/tty0",O_RDWR,0);	/* OS2019 */
 		(void) dup(0);
 		(void) dup(0);
 		_exit(execve("/bin/sh",argv,envp));

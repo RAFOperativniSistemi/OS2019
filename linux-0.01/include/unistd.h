@@ -135,6 +135,9 @@
 #define __NR_fstat64	197
 #define __NR_getdents64	220
 #define __NR_fcntl64	221
+/* OS2019 */
+#define __NR_OS2019fnc	230
+
 
 #define _syscall0(type,name) \
 type name(void) \
@@ -256,5 +259,8 @@ pid_t getpgrp(void);
 pid_t setsid(void);
 int getdents(unsigned int fd, struct dirent *dirp, unsigned int count);
 int getdents64(unsigned int fd, struct dirent64 *dirp, unsigned int count);
+
+/* OS2019 */
+int OS2019fnc(int a, int b, int *p);
 
 #endif

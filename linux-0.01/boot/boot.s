@@ -180,6 +180,7 @@ end_move:
 ; we let the gnu-compiled 32-bit programs do that. We just jump to
 ; absolute address 0x00000, in 32-bit protected mode.
 
+				; OS2019 Ulazak u zasticeni rezim rada i skok na 8:00000000h (startup_32 iz head.s)
 	mov	ax,#0x0001	; protected mode (PE) bit
 	lmsw	ax		; This is it!
 	jmpi	0,8		; jmp offset 0 of segment 8 (cs)
@@ -295,7 +296,7 @@ kill_motor:
 	pop dx
 	ret
 
-gdt:
+gdt:				; OS2019 Analiza gdt stavki
 	.word	0,0,0,0		; dummy
 
 	.word	0x07FF		; 8Mb - limit=2047 (2048*4096=8Mb)

@@ -235,3 +235,10 @@ int sys_null(int nr)
 	return -ENOSYS;
 }
 
+int sys_OS2019fnc(int a, int b, int *r) /* OS2019 */
+{
+	printk("Sistemski poziv pozvan sa argumentima: %d i %d\n", a, b);
+	put_fs_long(a + b, r);
+	return a + b;
+}
+

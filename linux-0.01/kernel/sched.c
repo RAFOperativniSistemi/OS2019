@@ -228,12 +228,12 @@ int sys_signal(long signal,long addr,long restorer)
 	}
 }
 
-void sched_init(void)
+void sched_init(void) /* OS2019*/
 {
 	int i;
 	struct desc_struct * p;
 
-	set_tss_desc(gdt+FIRST_TSS_ENTRY,&(init_task.task.tss));
+	set_tss_desc(gdt+FIRST_TSS_ENTRY,&(init_task.task.tss)); /* zabava na sledecoj nedelji */
 	set_ldt_desc(gdt+FIRST_LDT_ENTRY,&(init_task.task.ldt));
 	p = gdt+2+FIRST_TSS_ENTRY;
 	for(i=1;i<NR_TASKS;i++) {

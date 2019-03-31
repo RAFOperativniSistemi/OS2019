@@ -11,6 +11,22 @@
 
 #include <string.h>
 
+/* Standards for get_argv */
+#define ARG_PATH -1
+#define ARG_PWD -2
+#define ARG_SHLVL -3
+#define ARG_HOME -4
+#define ARG_EXECUTABLE -5
+
+/* 
+	In order to use these two functions, main should have a declaration like: 
+		int main(char *);
+*/
+/* Gets the number of program arguments */
+int get_argc(char *args);
+/* Gets the program argument argnum */
+char *get_argv(char *args, int argnum);
+
 /* Base 10 only */
 int itoa(int n, char *buf);
 
@@ -23,18 +39,21 @@ void pause(void);
 /* Reads from file fd until it hits maxlen or \n */
 int fgets(char *buffer, int maxlen, int fd);
 
+inline int printstr(char *s);
+inline int printerr(char *s);
+inline int println(char *s);
+
+
 #define vardump(x) \
 {\
-	char buff[128];\
-	int len;\
-	len = itoa(x, buff);\
+	char __vardump_buff[128];\
+	int __vardump_len;\
+	__vardump_len = itoa(x, __vardump_buff);\
 	write(1, #x ": ", strlen(#x ": "));\
-	write(1, buff, len);\
+	write(1, __vardump_buff, __vardump_len);\
 	write(1, "\n", 1);\
 }
 
-#define printstr(x) write(1, x, strlen(x));
-#define printerr(x) write(2, x, strlen(x));
 
 #ifdef UTIL_IMPLEMENTATION
 
@@ -42,6 +61,21 @@ int fgets(char *buffer, int maxlen, int fd);
 #define __isdigit(x) ((x >= '0') && (x <= '9'))
 #endif
 /* isdigit endif */
+
+inline int printstr(char *s)
+{
+	return write(1, s, strlen(s));
+}
+
+inline int printerr(char *s)
+{
+	return write(2, s, strlen(s));
+}
+
+inline int println(char *s)
+{
+	return printstr(s) + printstr("\n");
+}
 
 static void __reverse(char *buf, int len)
 {
@@ -100,6 +134,33 @@ int fgets(char *buffer, int maxlen, int fd)
 	buffer[i] = '\0';
 	return i;
 }
+
+int get_argc(char *args)
+{
+	int r = 0, i = 0;
+	while(strncmp(args + i, "PATH=", 5))
+	{
+		while(args[i++]);
+		r++;
+	}
+	vardump(r);
+	return r;
+}
+
+char *get_argv(char *args, int argnum)
+{
+	int i = 0, __tmp;
+	static int __offset[] = {5, 4, 6, 5, 2};
+	if(argnum >= 0) while(argnum--) while(args[i++]);
+	else
+	{
+		__tmp = argnum = -argnum - 1;
+		while(strncmp(args + i, "PATH=", 5)) while(args[i++]);
+		while(argnum--) while(args[i++]);
+		return args + i + __offset[__tmp];
+	}	
+	return args + i;
+} 
 
 
 #endif

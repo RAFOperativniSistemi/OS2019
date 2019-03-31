@@ -9,7 +9,7 @@
 .text
 .globl idt,gdt,pg_dir,startup_32
 pg_dir:
-startup_32:
+startup_32:	/* OS2019 */
 	movl $0x10,%eax
 	mov %ax,%ds
 	mov %ax,%es
@@ -26,11 +26,11 @@ startup_32:
 	lss stack_start,%esp
 	xorl %eax,%eax
 1:	incl %eax		# check that A20 really IS enabled
-	movl %eax,0x000000
+	movl %eax,0x000000	/* OS2019 Provera da li se memorija loop-uje */
 	cmpl %eax,0x100000
 	je 1b
 	movl %cr0,%eax		# check math chip
-	andl $0x80000011,%eax	# Save PG,ET,PE
+	andl $0x80000011,%eax	# Save PG,ET,PE /* Provera bitova 1 4 i 31 iz cr0 */
 	testl $0x10,%eax
 	jne 1f			# ET is set - 387 is present
 	orl $4,%eax		# else set emulate bit
@@ -49,7 +49,7 @@ startup_32:
  *  written by the page tables.
  */
 setup_idt:
-	lea ignore_int,%edx
+	lea ignore_int,%edx	/* OS2019 Analiza inicijalizovanja IDT i formiranja stavki za ignore_int  */
 	movl $0x00080000,%eax
 	movw %dx,%ax		/* selector = 0x0008 = cs */
 	movw $0x8E00,%dx	/* interrupt gate - dpl=0, present */
@@ -91,7 +91,7 @@ pg2:		# This is not used yet, but if you
 		# to use it.
 
 .org 0x4000
-after_page_tables:
+after_page_tables:	/* OS2019 */
 	pushl $0		# These are the parameters to main :-)
 	pushl $0
 	pushl $0
@@ -153,7 +153,7 @@ setup_paging:
 	movl %cr0,%eax
 	orl $0x80000000,%eax
 	movl %eax,%cr0		/* set paging (PG) bit */
-	ret			/* this also flushes prefetch-queue */
+	ret			/* this also flushes prefetch-queue */ /* OS2019 ret popuje sa steka IP koji je namesten na offset main (iz init/main.c) */
 
 .align 2
 .word 0
@@ -162,9 +162,9 @@ idt_descr:
 	.long idt
 .align 2
 .word 0
-gdt_descr:
-	.word 256*8-1		# so does gdt (not that that's any
-	.long gdt		# magic number, but it works for me :^)
+gdt_descr:	/* OS2019 gdt deskriptor */
+	.word 256*8-1		# so does gdt (not that that's any		/* broj stavki u gdt */
+	.long gdt		# magic number, but it works for me :^)		/* offset gdt-a */
 
 	.align 8
 idt:	.fill 256,8,0		# idt is uninitialized
