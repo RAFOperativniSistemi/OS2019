@@ -19,6 +19,10 @@
 #include <linux/tty.h>
 #include <asm/io.h>
 #include <asm/system.h>
+#include <asm/segment.h>
+
+
+#include <videowrite.h>
 
 #define SCREEN_START 0xb8000
 #define SCREEN_END   0xc0000
@@ -563,3 +567,37 @@ void con_init(void)
 	outb_p(a|0x80,0x61);
 	outb(a,0x61);
 }
+
+int sys_clear(void)
+{
+	int i;
+	for(i = 0; i < LINES; ++i)
+	{
+		scrup();
+	}
+	gotoxy(0,0);
+	return 0;
+}
+
+
+int sys_videowrite(const char *buffer, int len, struct videowrite_args *args)
+{
+	int x, y, i;
+	char c;
+	unsigned short *pos;
+	unsigned short col;
+	x = get_fs_long(&(args->pos.x));
+	y = get_fs_long(&(args->pos.y));
+	col = get_fs_word(&(args->col));
+
+	pos = origin + COLUMNS * 2 * y + 2 * x;
+
+	for(i = 0; i < len; i++)
+	{
+		c = get_fs_byte(buffer + i);
+		*pos++ = (col << 8) | c;
+	}
+
+	return i;
+}
+
