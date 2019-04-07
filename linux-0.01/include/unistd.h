@@ -137,8 +137,10 @@
 #define __NR_getdents64	220
 #define __NR_fcntl64	221
 
+/* OS2019 */
 #define __NR_videowrite 70
 #define __NR_clear 71
+#define __NR_change_user_layout 72
 
 #define _syscall0(type,name) \
 type name(void) \
@@ -261,7 +263,13 @@ pid_t setsid(void);
 int getdents(unsigned int fd, struct dirent *dirp, unsigned int count);
 int getdents64(unsigned int fd, struct dirent64 *dirp, unsigned int count);
 
+/* OS2019 */
 int videowrite(const char *buffer, int len, struct videowrite_args *args);
 int clear(void);
+
+#define KEY_LAYOUT 0
+#define SHIFT_LAYOUT 1
+#define ALT_LAYOUT 2
+int change_user_layout(const char *layout, int map);
 
 #endif

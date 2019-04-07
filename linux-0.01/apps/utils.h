@@ -143,7 +143,6 @@ int get_argc(char *args)
 		while(args[i++]);
 		r++;
 	}
-	vardump(r);
 	return r;
 }
 

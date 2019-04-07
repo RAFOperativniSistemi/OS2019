@@ -3,7 +3,7 @@
  */
 
 .text
-.globl keyboard_interrupt
+.globl keyboard_interrupt, user_key_ptr, user_shift_ptr, user_alt_ptr, selected_layout, user_key_map_size
 
 /*
  * these are for the keyboard read functions
@@ -98,9 +98,12 @@ put_queue:
 	popl %ecx
 	ret
 
+holding_alt: .long 0
+
 ctrl:	movb $0x04,%al
 	jmp 1f
-alt:	movb $0x10,%al
+alt:	movl $1, (holding_alt)
+	movb $0x10,%al
 1:	cmpb $0,e0
 	je 2f
 	addb %al,%al
@@ -108,7 +111,8 @@ alt:	movb $0x10,%al
 	ret
 unctrl:	movb $0x04,%al
 	jmp 1f
-unalt:	movb $0x10,%al
+unalt:	movl $0, (holding_alt)		/* OS 2019*/
+	movb $0x10,%al
 1:	cmpb $0,e0
 	je 2f
 	addb %al,%al
@@ -116,7 +120,13 @@ unalt:	movb $0x10,%al
 	andb %al,mode
 	ret
 
-lshift:
+lshift: 
+	pushf
+	cmp $0, (holding_alt) /* OS 2019 */
+	je 1f
+	call change_layout
+	1:
+	popf
 	orb $0x01,mode
 	ret
 unlshift:
@@ -267,18 +277,154 @@ alt_map:
 	.byte '|
 	.fill 10,1,0
 
+
+second_key_map:
+	.byte 0,27
+	.ascii "1234567890-="
+	.byte 127,9
+	.ascii "qwertyuiop[]"
+	.byte 10,0
+	.ascii "asdfghjkl;'"
+	.byte 0, 0
+	.ascii "\\zxcvbnm,./"
+	.byte 0,'*,0,32		/* 36-39 */
+	.fill 16,1,0		/* 3A-49 */
+	.byte '-,0,0,0,'+	/* 4A-4E */
+	.byte 0,0,0,0,0,0,0	/* 4F-55 */
+	.byte '<
+	.fill 10,1,0
+
+second_shift_map:
+	.byte 0,27
+	.ascii "!@#$%^&*()_+"
+	.byte 127,9
+	.ascii "QWERTYUIOP{}"
+	.byte 10,0
+	.ascii "ASDFGHJKL:\""
+	.byte 0, 0
+	.ascii "|ZXCVBNM<>?"
+	.byte 0,'*,0,32		/* 36-39 */
+	.fill 16,1,0		/* 3A-49 */
+	.byte '-,0,0,0,'+	/* 4A-4E */
+	.byte 0,0,0,0,0,0,0	/* 4F-55 */
+	.byte '>
+	.fill 10,1,0
+
+second_alt_map:
+	.byte 0,0
+	.ascii "\0@\0$\0\0{[]}\\\0"
+	.byte 0,0
+	.byte 0,0,0,0,0,0,0,0,0,0,0
+	.byte '~,10,0
+	.byte 0,0,0,0,0,0,0,0,0,0,0
+	.byte 0,0
+	.byte 0,0,0,0,0,0,0,0,0,0,0
+	.byte 0,0,0,0		/* 36-39 */
+	.fill 16,1,0		/* 3A-49 */
+	.byte 0,0,0,0,0		/* 4A-4E */
+	.byte 0,0,0,0,0,0,0	/* 4F-55 */
+	.byte '|
+	.fill 10,1,0
+
+user_key_map:
+	.byte 0,27
+	.ascii "12user7890-="
+	.byte 127,9
+	.ascii "qwertyuiop[]"
+	.byte 10,0
+	.ascii "asdfghjkl;'"
+	.byte 0, 0
+	.ascii "\\zxcvbnm,./"
+	.byte 0,'*,0,32		/* 36-39 */
+	.fill 16,1,0		/* 3A-49 */
+	.byte '-,0,0,0,'+	/* 4A-4E */
+	.byte 0,0,0,0,0,0,0	/* 4F-55 */
+	.byte '<
+	.fill 10,1,0
+
+user_shift_map:
+	.byte 0,27
+	.ascii "!@#$%^&*()_+"
+	.byte 127,9
+	.ascii "QWERTYUIOP{}"
+	.byte 10,0
+	.ascii "ASDFGHJKL:\""
+	.byte 0, 0
+	.ascii "|ZXCVBNM<>?"
+	.byte 0,'*,0,32		/* 36-39 */
+	.fill 16,1,0		/* 3A-49 */
+	.byte '-,0,0,0,'+	/* 4A-4E */
+	.byte 0,0,0,0,0,0,0	/* 4F-55 */
+	.byte '>
+	.fill 10,1,0
+
+user_alt_map:
+	.byte 0,0
+	.ascii "\0@\0$\0\0{[]}\\\0"
+	.byte 0,0
+	.byte 0,0,0,0,0,0,0,0,0,0,0
+	.byte '~,10,0
+	.byte 0,0,0,0,0,0,0,0,0,0,0
+	.byte 0,0
+	.byte 0,0,0,0,0,0,0,0,0,0,0
+	.byte 0,0,0,0		/* 36-39 */
+	.fill 16,1,0		/* 3A-49 */
+	.byte 0,0,0,0,0		/* 4A-4E */
+	.byte 0,0,0,0,0,0,0	/* 4F-55 */
+	.byte '|
+	.fill 10,1,0
+
+user_key_map_end:
+user_key_map_size: .int user_key_map_end - user_key_map
+
+
+/* OS2019 */
+key_maps: .long key_map, second_key_map, user_key_map
+shift_maps: .long shift_map, second_shift_map, user_shift_map
+alt_maps: .long alt_map, second_alt_map, user_alt_map
+
+user_key_ptr: .long user_key_map
+user_shift_ptr: .long user_shift_map
+user_alt_ptr: .long user_alt_map
+
+selected_layout: .int 0
+layouts_num: .int (shift_maps - key_maps) / 4
+
+layout_change_str: 	.ascii "Layout changed!\n"
+			.byte 0
+
+change_layout:	/* OS2019 */
+	incl (selected_layout)
+	push %eax
+	movl (selected_layout), %eax
+	cmp (layouts_num), %eax
+	jl 1f
+	movl $0, (selected_layout)
+	1:
+/*
+	pushl $layout_change_str
+	call printk
+	popl %eax
+*/
+	popl %eax
+	ret
+
+
 /*
  * do_self handles "normal" keys, ie keys that don't change meaning
  * and which have just one character returns.
  */
 do_self:
-	lea alt_map,%ebx
+	movl (selected_layout), %ebx
+	movl alt_maps(, %ebx, 4), %ebx
 	testb $0x20,mode		/* alt-gr */
 	jne 1f
-	lea shift_map,%ebx
+	movl (selected_layout), %ebx
+	movl shift_maps(, %ebx, 4), %ebx
 	testb $0x03,mode
 	jne 1f
-	lea key_map,%ebx
+	movl (selected_layout), %ebx
+	movl key_maps(, %ebx, 4), %ebx
 1:	movb (%ebx,%eax),%al
 	orb %al,%al
 	je none

@@ -235,3 +235,29 @@ int sys_null(int nr)
 	return -ENOSYS;
 }
 
+/* OS2019 */
+extern long user_key_ptr, user_shift_ptr, user_alt_ptr;
+extern int selected_layout, user_key_map_size;
+
+int sys_change_user_layout(const char *layout, int map)
+{
+	int i;
+	char *maps[] = {(char*)user_key_ptr, (char*)user_shift_ptr, (char*)user_alt_ptr};
+	if(map < 0 || map > 2)
+	{
+		return -1;
+	}
+	char *mp = maps[map], c;
+	for(i = 0; i < user_key_map_size; ++i)
+	{
+		c = get_fs_byte(layout + i);
+		*mp++ = c;
+	}
+	selected_layout = 2;
+	return 0;
+}
+
+
+
+
+

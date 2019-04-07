@@ -79,6 +79,7 @@ extern int sys_null();	/* not implemented sys_call */
 
 extern int sys_videowrite();
 extern int sys_clear();
+extern int sys_change_user_layout();
 
 fn_ptr sys_call_table[] = { sys_setup, sys_exit, sys_fork, sys_read,
 sys_write, sys_open, sys_close, sys_waitpid, sys_creat, sys_link,
@@ -93,7 +94,7 @@ sys_lock, sys_ioctl, sys_fcntl, sys_mpx, sys_setpgid, sys_ulimit,
 sys_oldolduname, sys_umask, sys_chroot, sys_ustat, sys_dup2, sys_getppid,
 sys_getpgrp,sys_setsid, sys_null /*67*/,sys_null,sys_null,
 
-/* 70 */sys_videowrite,sys_clear,sys_null,sys_null,sys_null,
+/* 70 */sys_videowrite,sys_clear,sys_change_user_layout,sys_null,sys_null, /* 70 - videowrite, 71 - clear, 72 - change layout*/
 sys_null,sys_null,sys_null,sys_null,sys_null,
 /* 80 */sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,
