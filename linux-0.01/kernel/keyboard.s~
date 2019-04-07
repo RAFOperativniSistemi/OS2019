@@ -3,7 +3,7 @@
  */
 
 .text
-.globl keyboard_interrupt, user_key_ptr, user_shift_ptr, user_alt_map, selected_layout, user_key_map_size
+.globl keyboard_interrupt, user_key_ptr, user_shift_ptr, user_alt_ptr, selected_layout, user_key_map_size
 
 /*
  * these are for the keyboard read functions
@@ -374,7 +374,7 @@ user_alt_map:
 	.byte '|
 	.fill 10,1,0
 
-user_key_map_end:
+
 user_key_map_size: .int user_key_map_end - user_key_map
 
 

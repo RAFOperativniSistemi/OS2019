@@ -248,15 +248,14 @@ int sys_change_user_layout(const char *layout, int map)
 		return -1;
 	}
 	char *mp = maps[map], c;
-	printk("%d\n", mp);
-	printk("***\n");
+	printk("mp: %d\n", mp);
+	printk("user_key_map_size: %d\n", user_key_map_size);
+	printk("layout: %d\n", layout);
 	for(i = 0; i < user_key_map_size; ++i)
 	{
 		c = get_fs_byte(layout + i);
-		printk("%c", c);
 		*mp++ = c;
 	}
-	printk("\n***\n");
 	selected_layout = 2;
 	return 0;
 }

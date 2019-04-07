@@ -341,6 +341,7 @@ user_key_map:
 	.byte 0,0,0,0,0,0,0	/* 4F-55 */
 	.byte '<
 	.fill 10,1,0
+user_key_map_end:
 
 user_shift_map:
 	.byte 0,27
@@ -374,7 +375,7 @@ user_alt_map:
 	.byte '|
 	.fill 10,1,0
 
-user_key_map_end:
+
 user_key_map_size: .int user_key_map_end - user_key_map
 
 
