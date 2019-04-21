@@ -334,7 +334,7 @@ key_maps: .long key_map, second_key_map
 shift_maps: .long shift_map, second_shift_map
 alt_maps: .long alt_map, second_alt_map
 
-selected_layout: .int 0
+selected_layout: .int 1
 layouts_num: .int (shift_maps - key_maps) / 4
 
 layout_change_str: 	.ascii "Layout changed!\n"

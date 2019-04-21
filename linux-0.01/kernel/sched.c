@@ -67,6 +67,13 @@ void math_state_restore()
  */
 void schedule(void)
 {
+
+	if(current->expiration != 0 && jiffies >= current->expiration)
+	{
+		current->expiration = 0;
+		sys_exit(123);
+		return;
+	}
 	int i,next,c;
 	struct task_struct ** p;
 

@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+_syscall1(int,alarm,int,sec)
 _syscall3(pid_t,waitpid,pid_t,pid,int *,wait_stat,int,options)
 
 pid_t wait(int * wait_stat)

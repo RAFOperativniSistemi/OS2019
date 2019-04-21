@@ -43,6 +43,8 @@ inline int printstr(char *s);
 inline int printerr(char *s);
 inline int println(char *s);
 
+inline int cprintstr(int col, char *s);
+inline int cprintln(int col, char *s);
 
 #define vardump(x) \
 {\
@@ -52,6 +54,16 @@ inline int println(char *s);
 	write(1, #x ": ", strlen(#x ": "));\
 	write(1, __vardump_buff, __vardump_len);\
 	write(1, "\n", 1);\
+}
+
+#define cvardump(col, x) \
+{\
+	char __vardump_buff[128];\
+	int __vardump_len;\
+	__vardump_len = itoa(x, __vardump_buff);\
+	col_write(col, #x ": ", strlen(#x ": "));\
+	col_write(col, __vardump_buff, __vardump_len);\
+	col_write(col, "\n", 1);\
 }
 
 
@@ -65,6 +77,16 @@ inline int println(char *s);
 inline int printstr(char *s)
 {
 	return write(1, s, strlen(s));
+}
+
+inline int cprintstr(int col, char *s)
+{
+	return col_write(col, s, strlen(s));
+}
+
+inline int cprintln(int col, char *s)
+{
+	return cprintstr(col, s) + printstr("\n");
 }
 
 inline int printerr(char *s)
@@ -108,10 +130,17 @@ int itoa(int n, char *buf)
 
 int atoi(const char *buf)
 {
-	int r = 0, i;
+	int r = 0, i, mul = 1;
+	if(*buf == '-')
+	{
+		mul = -1;
+		buf++;
+	}
+	if(*buf == ' ') buf++;
+
 	for(i = 0; __isdigit(buf[i]); ++i)
 		r = r * 10 + buf[i] - '0';
-	return r;
+	return mul * r;
 }
 
 void pause()

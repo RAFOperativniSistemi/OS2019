@@ -96,6 +96,12 @@ int sys_exit(int error_code)
 	return do_exit((error_code&0xff)<<8);
 }
 
+int sys_delayed_exit(int jiff)
+{
+	current->expiration = jiffies + jiff;
+	return 0;
+}
+
 int sys_waitpid(pid_t pid,int * stat_addr, int options)
 {
 	int flag=0;

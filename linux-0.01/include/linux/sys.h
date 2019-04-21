@@ -77,6 +77,10 @@ extern int sys_getdents64();
 extern int sys_fcntl64();
 extern int sys_null();	/* not implemented sys_call */
 
+
+extern int sys_col_write();
+extern int sys_delayed_exit();
+
 fn_ptr sys_call_table[] = { sys_setup, sys_exit, sys_fork, sys_read,
 sys_write, sys_open, sys_close, sys_waitpid, sys_creat, sys_link,
 sys_unlink, sys_execve, sys_chdir, sys_time, sys_mknod, sys_chmod,
@@ -92,7 +96,7 @@ sys_getpgrp,sys_setsid, sys_null /*67*/,sys_null,sys_null,
 
 /* 70 */sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,
-/* 80 */sys_null,sys_null,sys_null,sys_null,sys_null,
+/* 80 */sys_col_write,sys_delayed_exit,sys_null,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,
 /* 90 */sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,

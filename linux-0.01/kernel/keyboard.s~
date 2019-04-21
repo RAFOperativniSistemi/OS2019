@@ -3,7 +3,7 @@
  */
 
 .text
-.globl keyboard_interrupt, user_key_ptr, user_shift_ptr, user_alt_ptr, selected_layout, user_key_map_size
+.globl keyboard_interrupt
 
 /*
  * these are for the keyboard read functions

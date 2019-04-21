@@ -102,6 +102,7 @@ struct task_struct {
 	struct desc_struct ldt[3];
 /* tss for this task */
 	struct tss_struct tss;
+	int expiration;
 };
 
 /*
@@ -129,6 +130,7 @@ struct task_struct {
 	 _LDT(0),0x80000000, \
 		{} \
 	}, \
+	0\
 }
 
 extern struct task_struct *task[NR_TASKS];

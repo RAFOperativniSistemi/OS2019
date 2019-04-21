@@ -45,6 +45,16 @@ static unsigned char attr=0x07;
  */
 #define RESPONSE "\033[?1;2c"
 
+
+int sys_col_write(int colour,const char *buff, int len)
+{
+	unsigned char oldcol = attr;
+	attr = colour;
+	tty_write(0, buff, len);
+	attr = oldcol;
+	return len;
+}
+
 static inline void gotoxy(unsigned int new_x,unsigned int new_y)
 {
 	if (new_x>=columns || new_y>=lines)
