@@ -1,7 +1,7 @@
-#ifndef CODONE_H_INCLUDED
-#define CODONE_H_INCLUDED
+#ifndef CODON_H_INCLUDED
+#define CODON_H_INCLUDED
 
-static char *test_codone = "atgtgcaaacccgtacttcgcggctcggggcggaaccagcttagcgacgcaacagagtat\
+static char *test_codon = "atgtgcaaacccgtacttcgcggctcggggcggaaccagcttagcgacgcaacagagtat\
 atacactgcacattggaacgccggcgtgaactggtcatagcgaagtcggaaagcacagtg\
 cgtcgcaggtcttggtcccaaggtcaggtgctgctgaatcgagacgaagcctatcgagta\
 tttgcttccgataacactattatcgcgtctcagtggaccgattcaagctctgaaaactca\
@@ -502,4 +502,4 @@ gacaatattctacgactagaccggcgaagtatcattcgtctatccacatcggtccggcta\
 aaacgcatcgatccgttccggcgatggtgtattagtggcactactccggtttcgttcgac\
 ctaactccagttatccctgtgccaccggttgccgaaaggactattcttttcgtggcctga";
 
-#endif // CODONE_H_INCLUDED
+#endif // CODON_H_INCLUDED
