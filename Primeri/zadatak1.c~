@@ -66,7 +66,7 @@ void show(int arr[], int n)
 	for(i = 0; i < n; ++i)
 	{
 		printf("%5d ", arr[i]);
-		if(!(i%12)) printf("\n");
+		if(!(i%15)) printf("\n");
 	}
 	printf("\n");
 

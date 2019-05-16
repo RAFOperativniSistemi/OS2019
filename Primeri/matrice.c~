@@ -111,14 +111,3 @@ void* thread_matrix_multiplier(void *_args)
     }
     result->m_data[result->m_columns * args->y + args->x] = sum;
 }
-
-
-
-
-
-
-
-
-
-
-
