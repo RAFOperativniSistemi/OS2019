@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
 
     struct matrix_t res = {NULL, 0, 0};
 
+	{int a,b;} x;
+
     show_matrix(&m1);
     printf("\n");
 
