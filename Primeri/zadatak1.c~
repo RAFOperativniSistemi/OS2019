@@ -79,7 +79,7 @@ void *analyzer_thread(void *_args)
 			/* Pronasli */
 			//printf("%d\n", pos + i);
 			
-			result[k++] = pos + i - 2;
+			result[k++] = pos + i - 3;
 			
 		}
 		
