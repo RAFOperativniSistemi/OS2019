@@ -1,6 +1,6 @@
 all: stanje_trke.c prosti_mutex.c
 	gcc stanje_trke.c -o stanje_trke -pthread
-	gcc prosti_mutex.c -o prosti_mutex -pthread
+	gcc stanje_trke.c -o stanje_trke -pthread
 
 
 clean:

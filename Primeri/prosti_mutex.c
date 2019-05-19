@@ -4,27 +4,38 @@
 pthread_mutex_t x_lock;
 int x = 0;
 
+
+#define N 5000
+#define M 100000
+
 void* incrementer(void *args)
 {
-		int i;
-		pthread_mutex_lock(&x_lock);
-		for(i = 0; i < 100000; i++)
+		int i, j;
+		for(i = 0; i < N; i++)
 		{
-				x++;
+			pthread_mutex_lock(&x_lock);
+			for(j = 0; j < M; j++)
+			{
+				x += 1;
+			}
+			pthread_mutex_unlock(&x_lock);
 		}
-		pthread_mutex_unlock(&x_lock);
 }
 
 void* decrementer(void *args)
 {
-		int i;
-		pthread_mutex_lock(&x_lock);
-		for(i = 0; i < 100000; i++)
+		int i, j;
+		for(i = 0; i < N; i++)
 		{
-				x--;
+			pthread_mutex_lock(&x_lock);
+			for(j = 0; j < M; j++)
+			{
+				x -= 1;
+			}
+			pthread_mutex_unlock(&x_lock);
 		}
-		pthread_mutex_unlock(&x_lock);
 }
+
 
 int main(int argc, char *argv[])
 {
