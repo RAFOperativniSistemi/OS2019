@@ -12,6 +12,7 @@
 
 #define clear() printf("\033[H\033[J")
 
+/* Pomocni semafor koji cemo koristiti da bebedno dovedemo klijenta na salter */
 sem_t mutx;
 
 sem_t salteri;
@@ -23,6 +24,10 @@ int zavrsili[M];
 int zauzmi_salter(int id)
 {
 	int i;
+	/*
+		Ovde koristimo pomocni semafor jer bi bilo prilicno lose
+		ako bi ova nit bila prekinuta u sred ove for petlje.
+	*/
 	sem_wait(&mutx);
 	for(i = 0; i < N; i++)
 	{
@@ -38,11 +43,18 @@ int zauzmi_salter(int id)
 
 void oslobodi_salter(int sid)
 {
-	sem_wait(&mutx);
+	sem_wait(&mutx); //verovatno mozemo i bez ovoga, ali nece da se baci
 	salteri_ljudi[sid] = -1;
 	sem_post(&mutx);
 }
 
+/*
+	Funkcija niti, tj. klijenta u posti. Radi sledece:
+	-Dolazi na pocetak reda u nasumicnom trenutku.
+	-Ceka da se neki salter oslobodi, i zauzme ga.
+	-Radi na salteru nasumicnu kolicinu vremena.
+	-Oslobodi salter.
+*/
 void* cekaj(void *_args)
 {
 	int id = *((int *) _args);
@@ -52,7 +64,8 @@ void* cekaj(void *_args)
 	cekaju[id] = 1;
 
 	sem_wait(&salteri);
-	int x = zauzmi_salter(id);
+	/* znamo da sada ima neki slobodan salter - zauzmemo ga */
+	int x = zauzmi_salter(id); 
 
 	cekaju[id] = 0;
 	sleep(5 + rand() % 5);
@@ -95,12 +108,7 @@ void* prikaz_thread(void *_args)
 				printf("%d ", i);
 		}
 		printf("\n");
-
-
 	}
-
-	
-
 }
 
 
@@ -133,6 +141,9 @@ int main(int argc, char *argv[])
 	}
 
 	sleep(1);
+
+	sem_destroy(&mutx);
+	sem_destroy(&salteri);
 
 	return 0;
 }

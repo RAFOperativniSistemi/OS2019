@@ -5,14 +5,20 @@
 #define N (5)
 
 pthread_mutex_t stapici[N];
+pthread_mutex_t konobar;
 int neko_jede = 0;
+
+/*
+	Ova aplikacija ce da radi u beskonacnoj petlji.
+	Za prekidanje njenog rada, mozemo da uradimo CTRL+C u konzoli.
+*/
 
 void* checker_thread(void *_args)
 {
 	do
 	{
 		neko_jede = 0;
-		sleep(2);
+		sleep(5);
 	}while(neko_jede);
 	printf("Niko vise ne jede, posto niko ne moze da dobije drugu viljusku!\n");
 }
@@ -25,13 +31,20 @@ void* filozof_thread(void *_args)
 
 	while(1)
 	{
-
+		/*
+			Tek kada dobijemo dozvolu od konobara (uzmemo mutex) mozemo da pristupimo uzimanju stapica.
+			Ovo znaci da kada filozof krene sa uzimanjem levog stapica on ce uzeti i desni, tj. nece biti prekinut
+			tokom ovog procesa od strane drugog filozofa koji bi takodje zeleo da uzme neki stapic.
+		*/
+		pthread_mutex_lock(&konobar);
 		pthread_mutex_lock(&stapici[levi]); /* razmislja dok je zauzet levi stapic */
 
 		pthread_mutex_lock(&stapici[desni]); /* razmislja dok je zauzet desni stapic */
+		pthread_mutex_unlock(&konobar);
 
 		printf("Filozof %d jede!\n", id);
 		neko_jede = 1;
+		//sleep(1);
 		
 		/* Jede */
 
@@ -39,15 +52,11 @@ void* filozof_thread(void *_args)
 		pthread_mutex_unlock(&stapici[desni]); /* Pusta desnu viljusku */
 
 		/* Razmislja posle jela */
-
+		//sleep(1);
 	}
 	
 
 }
-
-
-
-
 
 int main(int argc, char *argv[])
 {
@@ -56,6 +65,7 @@ int main(int argc, char *argv[])
 	{
 		pthread_mutex_init(&stapici[i], NULL);
 	}
+	pthread_mutex_init(&konobar, NULL);
 	
 	pthread_t threads[N];
 	pthread_t checker;
@@ -70,6 +80,12 @@ int main(int argc, char *argv[])
 	pthread_create(&checker, NULL, checker_thread, NULL);
 
 	pthread_join(checker, NULL);
+
+	for(i=0; i < N; i++)
+	{
+		pthread_mutex_destroy(&stapici[i]);
+	}
+	pthread_mutex_destroy(&konobar);
 
 	return 0;
 }

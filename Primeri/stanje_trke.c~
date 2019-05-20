@@ -3,10 +3,6 @@
 
 int x = 0;
 
-/*
-	Imacemo N * M inkrementiranja i N * M dekrementiranja brojaca x.
-	Dakle, ocekujemo da brojac bude 0 na kraju rada aplikacije.
-*/
 #define N (5000)
 #define M (100000)
 
@@ -17,7 +13,7 @@ void* incrementer(void *args)
 		{
 			for(j = 0; j < M; j++)
 			{
-				x += 1; //inkrementiranja
+				x += 1;
 			}
 		}
 }
@@ -29,7 +25,7 @@ void* decrementer(void *args)
 		{
 			for(j = 0; j < M; j++)
 			{
-				x -= 1; //dekrementiranja
+				x -= 1;
 			}
 		}
 }
@@ -42,10 +38,6 @@ int main(int argc, char *argv[])
 		
 		pthread_join(t1, NULL);
 		pthread_join(t2, NULL);
-
-		/*
-			Obe niti su se izvrsile tacno jednom. Sacekali smo da se zavrse.
-			Posto su obe niti imale isti broj koraka u petlji, brojac bi trebalo da je 0.
-		*/		
+		
 		printf("x: %d\n", x);
 }

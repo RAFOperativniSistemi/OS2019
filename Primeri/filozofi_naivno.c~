@@ -4,18 +4,25 @@
 
 #define N (5)
 
+/*
+	Stapice cemo da ilustrujemo pomocu mutex-a. Tipicno bi to bio neki resurs koji je blokirajuc,
+	npr. stampac ili skener ili slicno. Da se ne bismo majali sa pravim hardverom, reci cemo da je
+	zakljucavanje mutex-a ekvivalentno uzimanju resursa, a otkljucavanje mutex-a ekvivalentno oslobadjanju.
+*/
 pthread_mutex_t stapici[N];
-pthread_mutex_t konobar;
 int neko_jede = 0;
 
+/*
+	Pomocna nit koja ce da nas izvuce iz deadlock situacije, ako se ona desi.
+*/
 void* checker_thread(void *_args)
 {
 	do
 	{
 		neko_jede = 0;
-		sleep(5);
+		sleep(2);
 	}while(neko_jede);
-	printf("Niko vise ne jede, posto niko ne moze da dobije drugu viljusku!\n");
+	printf("Niko vise ne jede, posto niko ne moze da dobije drugi stapic!\n");
 }
 
 void* filozof_thread(void *_args)
@@ -26,21 +33,24 @@ void* filozof_thread(void *_args)
 
 	while(1)
 	{
-		/*
-			Tek kada dobijemo dozvolu od konobara (uzmemo mutex) mozemo da pristupimo uzimanju stapica.
-			Ovo znaci da kada filozof krene sa uzimanjem levog stapica on ce uzeti i desni, tj. nece biti prekinut
-			tokom ovog procesa od strane drugog filozofa koji bi takodje zeleo da uzme neki stapic.
-		*/
-		pthread_mutex_lock(&konobar);
-		pthread_mutex_lock(&stapici[levi]); /* razmislja dok je zauzet levi stapic */
 
+		pthread_mutex_lock(&stapici[levi]); /* razmislja dok je zauzet levi stapic */
+		/*
+			printf je relativno spora operacija, posto je sistemski poziv. Ovo ce sasvim lepo povecati verovatnocu
+			da svih pet filozofa podigne levi stapic i bude skinuto sa izvrsavanja pre uzimanja desnog.
+		*/
+		printf("Filozof %d uzeo levi stapic!\n", id);
 		pthread_mutex_lock(&stapici[desni]); /* razmislja dok je zauzet desni stapic */
-		pthread_mutex_unlock(&konobar);
 
 		printf("Filozof %d jede!\n", id);
 		neko_jede = 1;
+		/*
+			U praksi bi rad sa resursom trajao neko vreme, sto bismo mogli da simuliramo sa sleep.
+			Nama to kvari primer posto bi nam taj sleep ozbiljno smanjio verovatnocu za deadlock.
+			Morali bismo da pustamo aplikaciju da radi veoma veoma dugo pre nego se zablokira,
+			ali deadlock bi i dalje bio tu kao realna mogucnost.
+		*/
 		//sleep(1);
-		
 		/* Jede */
 
 		pthread_mutex_unlock(&stapici[levi]); /* Pusta levu viljusku */
@@ -60,7 +70,6 @@ int main(int argc, char *argv[])
 	{
 		pthread_mutex_init(&stapici[i], NULL);
 	}
-	pthread_mutex_init(&konobar, NULL);
 	
 	pthread_t threads[N];
 	pthread_t checker;

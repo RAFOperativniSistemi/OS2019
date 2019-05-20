@@ -4,8 +4,6 @@
 
 #include <semaphore.h>
 
-
-
 #define BUFFER_SIZE (15)
 
 int buffer[BUFFER_SIZE];
@@ -22,16 +20,19 @@ int productions = PRODUCES;
 
 int consumes = PRODUCES;
 
-
 sem_t mutx; /* mutex */
-sem_t full; /* Full slots */
-sem_t empty; /* Empty slots */
+sem_t full; /* brojac za popunjena mesta u deljenom redu - inicijalizuje se na 0 */
+sem_t empty; /* brojac za slobodna mesta u deljenom redu - inicijalizuje se na BUFFER_SIZE */
 
 int consumed[PRODUCES];
 int consumed_index = 0;
 
-
 sem_t mutx_consume;
+
+/*
+	Operacija koju consumer niti izvrsavaju kada uzmu podatak iz deljenog reda.
+	Upisuje podatak u "consumed" niz na bezbedan nacin.
+*/
 void consume(int product)
 {
 	sem_wait(&mutx_consume);
@@ -42,6 +43,15 @@ void consume(int product)
 	sem_post(&mutx_consume);
 }
 
+/*
+	Funkcija za producer niti. Radi sledece u petlji:
+	-Prestaje sa radom ako je globalni brojac produkcija pao na 0.
+	-Spava 1-6 sekundi.
+	-Generise nasumicni podatak.
+	-Blokira se ako je blokirajuci red pun.
+	-Pod mutex-om upisuje u deljeni red.
+	-Javlja da je nesto upisano u red.
+*/
 void* producer(void *_args)
 {
 	int product;
@@ -54,7 +64,13 @@ void* producer(void *_args)
 		usleep(1000000 + rand() % 5000000);
 		product = rand() % 100;
 
-		sem_wait(&empty);
+		/*
+			"empty" je semafor koji je brojac praznih mesta u redu.
+			Ovde njega dekrementiramo, i ako je on pao na 0, znaci da je red pun i mi se blokiramo.
+			Ako smo se ovde blokirali, bicemo probudjeni od strane consumer
+			niti koja ce ovaj brojac da inkrementira nakon sto uzme nesto iz reda.
+		*/
+		sem_wait(&empty); 
 		sem_wait(&mutx);
 
 		/* Upisi u buffer */
@@ -64,16 +80,28 @@ void* producer(void *_args)
 		in = (in + 1) % BUFFER_SIZE;
 
 		sem_post(&mutx);
+
+		/*
+			Inkrementiramo "full" - brojac popunjenih mesta u deljenom redu.
+			Ako je blokirajuci red pre ovoga bio prazan, ovo ce eventualno da
+			oslobodi neku consumer nit koja je bila blokirana nad tim uslovom.
+		*/
 		sem_post(&full);
-
-
 
 	}
 
 	pthread_exit(NULL);
-
 }
 
+/*
+	Funkcija za consumer niti. Radi sledece u petlji:
+	-Prestaje sa radom ako je globalni brojac konzumiranja pao na 0.
+	-Blokira se ako je blokirajuci red prazan.
+	-Pod mutex-om cita iz deljenog reda.
+	-Javlja da je nesto uzeto iz reda.
+	-Obradjuje podatak (operacija consume() )
+	-Spava 1-6 sekundi.
+*/
 void* consumer(void *_args)
 {
 	int product;
@@ -82,8 +110,12 @@ void* consumer(void *_args)
 		if(consumes <= 0)
 			break;
 
-		
-
+		/*
+			Posto je "full" brojac popunjenih mesta u deljenom redu, ovde ga dekrementiramo,
+			ako je on na 0, znaci da ne mozemo da citamo, i blokiramo se.
+			Ako smo se blokirali ovde, bicemo probudjeni od strane producer niti,
+			koja ce povecati ovaj brojac nakon sto upise nesto u red.
+		*/
 		sem_wait(&full);
 		sem_wait(&mutx);
 
@@ -95,14 +127,16 @@ void* consumer(void *_args)
 		out = (out + 1) % BUFFER_SIZE;
 
 		sem_post(&mutx);
+
+		/*
+			Inkrementiramo "empty" brojac, koji broji koliko ima praznih mesta u blokirajucem redu.
+			Ovime cemo da potencijalno probudimo nekog producera koji se blokirao jer je red bio pun.
+		*/
 		sem_post(&empty);
 
 		consume(product);
 		usleep(1000000 + rand() % 5000000);
 		
-
-
-
 	}
 
 	pthread_exit(NULL);
@@ -130,7 +164,6 @@ void* printer_thread(void *_args)
 	printf(RESET);
 	while(1)
 	{
-
 		usleep(1000);
 		clear();
 		printf(RESET);
@@ -138,7 +171,7 @@ void* printer_thread(void *_args)
 		sem_getvalue(&empty, &em);
 
 
-		printf("Produces left: %d\n\n", productions);
+		printf("\n\nProduces left: %d\n\n", productions);
 
 		printf("Buffer size: %d\n", BUFFER_SIZE);
 		printf("%d full slots!\n", fl);
@@ -179,7 +212,6 @@ void* printer_thread(void *_args)
 	}
 	
 }
-
 
 int main(int argc, char *argv[])
 {

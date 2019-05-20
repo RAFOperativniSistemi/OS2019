@@ -13,7 +13,7 @@ void* incrementer(void *args)
 		int i, j;
 		for(i = 0; i < N; i++)
 		{
-			pthread_mutex_lock(&x_lock);
+			pthread_mutex_lock(&x_lock); //garantuje da ce inkrementiranje biti atomicno
 			for(j = 0; j < M; j++)
 			{
 				x += 1;
@@ -27,7 +27,7 @@ void* decrementer(void *args)
 		int i, j;
 		for(i = 0; i < N; i++)
 		{
-			pthread_mutex_lock(&x_lock);
+			pthread_mutex_lock(&x_lock); //garantuje da ce dekrementiranje biti atomicno
 			for(j = 0; j < M; j++)
 			{
 				x -= 1;
@@ -49,4 +49,6 @@ int main(int argc, char *argv[])
 		pthread_join(t2, NULL);
 		
 		printf("x: %d\n", x);
+
+		pthread_mutex_destroy(&x_lock);
 }
