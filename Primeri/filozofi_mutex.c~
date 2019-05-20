@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
+
+#include <semaphore.h>
+
+/* Broj saltera */
+#define N (5)
+
+/* Broj ljudi koji cekaju */
+#define M (100)
+
+sem_t mutx;
+
+sem_t salteri;
+int salteri_ljudi[N];
+
+int otpoceli[M];
+int zavrsili[M];
+
+int zauzmi_salter(int id)
+{
+	int i;
+	sem_wait(&mutx);
+	for(i = 0; i < N; i++)
+	{
+		if(salteri_ljudi[i] == -1)
+		{
+			salteri_ljudi[i] = id;
+			break;
+		}
+	}
+	sem_post(&mutx);
+	return i;
+}
+
+void oslobodi_salter(int sid)
+{
+	sem_wait(&mutx);
+	salteri_ljudi[sid] = -1;
+	sem_post(&mutx);
+}
+
+void* cekaj(void *_args)
+{
+	int id = *((int *) _args);
+	sem_wait(&salteri);
+	int x = zauzmi_salter(id);
+	otpoceli[id] = 1;
+	sleep(3);
+	zavrsili[id] = 1;
+	oslobodi_salter(x);
+	sem_post(&salteri);
+}
+
+
+int main(int argc, char *argv[])
+{
+	sem_init(&salteri, 0, N);
+	sem_init(&mutx, 0, 1);
+	int i;
+	for(i = 0; i < N; i++)
+	{
+		salteri_ljudi[i] = -1;
+	}
+
+	pthread_t ljudi[M];
+	int ids[M];
+
+	for(i = 0; i < M; i++)
+	{
+		ids[i] = i;
+		pthread_create(&ljudi[i], NULL, cekaj, (void *)(&ids[i]));
+	}
+
+	for(i = 0; i < M; i++)
+	{
+		pthread_join(ljudi[i], NULL);
+	}
+
+	return 0;
+}

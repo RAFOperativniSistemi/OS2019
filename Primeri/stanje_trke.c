@@ -3,8 +3,8 @@
 
 int x = 0;
 
-#define N 5000
-#define M 100000
+#define N (5000)
+#define M (100000)
 
 void* incrementer(void *args)
 {
