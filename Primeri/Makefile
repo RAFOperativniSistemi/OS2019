@@ -1,11 +1,5 @@
-all: stanje_trke.c prosti_mutex.c filozofi_naivno.c filozofi_mutex.c prosti_semafori.c blokirajuci_red.c
-	gcc stanje_trke.c -o stanje_trke -pthread
-	gcc prosti_mutex.c -o prosti_mutex -pthread
-	gcc filozofi_naivno.c -o filozofi_naivno -pthread
-	gcc filozofi_mutex.c -o filozofi_mutex -pthread
-	gcc prosti_semafori.c -o prosti_semafori -pthread
-	gcc blokirajuci_red.c -o blokirajuci_red -pthread
-
-
+all: barrier_simple.c
+	gcc barrier_simple.c -o barrier_simple -pthread
+	
 clean:
-	rm stanje_trke.c
+	rm barrier_simple
