@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <semaphore.h>
 
-#define THREADS 4
-
 #define clear() printf("\033[H\033[J")
 
 struct thread_args

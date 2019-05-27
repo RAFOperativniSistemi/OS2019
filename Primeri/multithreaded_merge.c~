@@ -281,8 +281,5 @@ int main(int argc, char *argv[])
 		printf("GOOD!\n");
 	else
 		printf("BAD!\n");
-
-
-	
 	
 }
