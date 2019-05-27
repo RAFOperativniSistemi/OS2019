@@ -3,20 +3,18 @@
 #include <stdlib.h>
 #include <semaphore.h>
 
-#define THREADS 4
-
 #define clear() printf("\033[H\033[J")
 
 struct thread_args
 {
-	int id;
-	int start;
-	int *arr;
+	int id; //redni broj niti
+	int start; //indeks pocetka sortiranja za ovu nit
+	int *joblens; //za svaku nit, duzina njene sekcije
+	int *arr; //kompletan niz
 	pthread_barrier_t *barrier;
-	int *joblens;
-	int threads;
-	int rings;
-	sem_t *semaph;
+	int threads; //ukupan broj niti koje rade sortiranje
+	int rings; //broj spajanja + 1
+	sem_t *semaph; //zeleno zuto crveno
 	
 };
 
@@ -143,7 +141,7 @@ void *sorter_thread(void *_args)
 			{
 				pthread_barrier_destroy(barrier);
 				int splits = 1 << ring;
-				int survivors = threads / splits; /* n / 2^(ring + 1) + 1 if not divisible */
+				int survivors = threads / splits; /* n / 2^(ring + 1) and + 1 if not divisible */
 				if(threads % splits) survivors++;
 				pthread_barrier_init(barrier, NULL, survivors);
 				for(i = 0; i < survivors - 1; i++)
@@ -159,7 +157,9 @@ void *sorter_thread(void *_args)
 			int merge_middle = start;
 			int blocksl = 0, blocksr = 0;
 
-			for(i = id; i < id + 1 << (ring - 1); i++)
+			int blocks_to_take = 1 << (ring - 1);
+
+			for(i = id; i < id + blocks_to_take; i++)
 			{
 				if(i < threads)
 				{
@@ -169,7 +169,7 @@ void *sorter_thread(void *_args)
 			}
 			merge_middle --;
 			int merge_right = merge_middle;
-			for(i = id + blocksl; i < id + blocksl + 1 << (ring - 1); i++)
+			for(i = id + blocksl; i < id + blocksl + blocks_to_take; i++)
 			{
 				if(i < threads)
 				{
@@ -199,10 +199,10 @@ int multithreaded_sort(int arr[], int n, int nthreads)
 	int i;
 	
 	while(n / nthreads < 3)
-		nthreads --;	/* this only works if the minimal load per thread is 3 */
+		nthreads--;	/* this only works if the minimal load per thread is 3 */
 
 	pthread_barrier_t barrier;
-	pthread_barrier_init(&barrier,NULL,nthreads);
+	pthread_barrier_init(&barrier, NULL, nthreads);
 
 	sem_t semaph;
 	sem_init(&semaph, 0, 0);
@@ -223,7 +223,7 @@ int multithreaded_sort(int arr[], int n, int nthreads)
 
 	for(i = 0; i < nthreads; i++)
 	{
-		args[i] = (struct thread_args) {i, joblen * i, arr, &barrier, joblens,nthreads, rings, &semaph};
+		args[i] = (struct thread_args) {i, joblen * i, joblens, arr, &barrier, nthreads, rings, &semaph};
 		pthread_create(&threads[i], NULL, sorter_thread, (void*)(&args[i]));
 	}
 
